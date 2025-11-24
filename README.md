@@ -52,7 +52,9 @@ En Visual Studio, ve a Herramientas > Administrador de paquetes NuGet > Consola 
 Asegúrate de que el Proyecto predeterminado (menú desplegable en la consola) sea JustiSafe.Data.
 
 Ejecuta el comando:
-
+```bash
+Add-Migration UpdateUserFields
+```
 ```bash
 Update-Database
 ```
