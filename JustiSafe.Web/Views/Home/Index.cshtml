@@ -10,7 +10,7 @@
         @if (User.Identity?.IsAuthenticated == true)
         {
             <div class="alert alert-success d-inline-block">
-                👋 Hola, <strong>@User.Identity.Name</strong>. Sesión activa.
+                👋 Sesión activa para: <strong>@User.Identity.Name</strong>
             </div>
         }
     </div>
@@ -23,14 +23,11 @@
                     <div class="display-1 mb-3">📂</div>
                     <h3 class="card-title text-primary">Gestión de Casos</h3>
                     <p class="card-text">
-                        Acceda a sus expedientes asignados, cree nuevos casos anonimizados o actualice sentencias.
+                        Acceda a sus expedientes asignados y actualice sentencias.
                     </p>
                     <div class="d-grid gap-2">
                         <a asp-controller="Cases" asp-action="Index" class="btn btn-primary btn-lg">
-                            Ver Mis Casos
-                        </a>
-                        <a asp-controller="Cases" asp-action="Create" class="btn btn-outline-primary">
-                            + Nuevo Caso
+                            Ver casos asignados
                         </a>
                     </div>
                 </div>
@@ -43,7 +40,7 @@
                     <div class="display-1 mb-3">💬</div>
                     <h3 class="card-title text-success">Soporte Anónimo</h3>
                     <p class="card-text">
-                        ¿Problemas técnicos? Comuníquese en tiempo real con nuestro equipo de soporte a través de un canal seguro.
+                        Canal seguro y encriptado para asistencia técnica.
                     </p>
                     <div class="d-grid">
                         <a asp-controller="Chat" asp-action="Index" class="btn btn-success btn-lg mt-auto">
