@@ -11,17 +11,20 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">⚖️ JustiSafe</a>
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-bank"></i> JustiSafe
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-white" asp-controller="Cases" asp-action="Index">Casos</a>
                             </li>
@@ -30,20 +33,21 @@
                             </li>
                         }
                     </ul>
-                    <ul class="navbar-nav">
+
+                    <ul class="navbar-nav align-items-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <span class="nav-link text-light">Hola, <strong>@User.Identity.Name</strong></span>
+                            <li class="nav-item me-3">
+                                <div class="text-white d-flex align-items-center border border-light rounded px-2 py-1">
+                                    <i class="bi bi-person-badge me-2"></i>
+                                    <small class="me-1">ID:</small>
+                                    <strong>@User.Identity.Name</strong>
+                                </div>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-danger btn-sm ms-2 mt-1" asp-controller="Account" asp-action="Logout">Salir</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Account" asp-action="Login">Ingresar</a>
+                                <a class="btn btn-danger btn-sm" asp-controller="Account" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right"></i> Salir
+                                </a>
                             </li>
                         }
                     </ul>
@@ -51,6 +55,7 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
