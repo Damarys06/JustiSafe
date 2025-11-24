@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">🏛️ Bienvenido a JustiSafe</h1>
+        <p class="lead text-muted">Sistema Seguro de Anonimización Judicial</p>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="alert alert-success d-inline-block">
+                👋 Hola, <strong>@User.Identity.Name</strong>. Sesión activa.
+            </div>
+        }
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5 mb-4">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body text-center">
+                    <div class="display-1 mb-3">📂</div>
+                    <h3 class="card-title text-primary">Gestión de Casos</h3>
+                    <p class="card-text">
+                        Acceda a sus expedientes asignados, cree nuevos casos anonimizados o actualice sentencias.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Cases" asp-action="Index" class="btn btn-primary btn-lg">
+                            Ver Mis Casos
+                        </a>
+                        <a asp-controller="Cases" asp-action="Create" class="btn btn-outline-primary">
+                            + Nuevo Caso
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body text-center">
+                    <div class="display-1 mb-3">💬</div>
+                    <h3 class="card-title text-success">Soporte Anónimo</h3>
+                    <p class="card-text">
+                        ¿Problemas técnicos? Comuníquese en tiempo real con nuestro equipo de soporte a través de un canal seguro.
+                    </p>
+                    <div class="d-grid">
+                        <a asp-controller="Chat" asp-action="Index" class="btn btn-success btn-lg mt-auto">
+                            Abrir Chat en Vivo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

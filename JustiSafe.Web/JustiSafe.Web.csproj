@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JustiSafe.Core\JustiSafe.Core.csproj" />
     <ProjectReference Include="..\JustiSafe.Data\JustiSafe.Data.csproj" />
   </ItemGroup>
 

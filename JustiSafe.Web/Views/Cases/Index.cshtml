@@ -1,0 +1,79 @@
+﻿@model IEnumerable<JustiSafe.Data.Entities.Case>
+
+@{
+    ViewData["Title"] = "Mis Casos";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📂 Expedientes Judiciales</h2>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                ⚖️ Sortear Nuevo Caso
+            </a>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-striped table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Código Anónimo</th>
+                <th>Fecha Ingreso</th>
+                <th>Estado</th>
+                <th>Protocolo de Asignación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold text-primary">@item.AnonCode</td>
+
+                    <td>@item.CreatedAt.ToShortDateString()</td>
+
+                    <td>
+                        <span class="badge bg-info text-dark">@item.Status</span>
+                    </td>
+
+                    <td>
+                        @if (item.Judge != null)
+                        {
+                            <span class="badge bg-secondary">
+                                🔒 Identidad Protegida
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-warning">Pendiente de Sorteo</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-secondary">Ver Detalles</a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning mt-3">No hay casos asignados o registrados.</div>
+    }
+</div>

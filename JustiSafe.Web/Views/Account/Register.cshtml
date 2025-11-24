@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Registrarse - JustiSafe";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h3>📝 Crear Nueva Cuenta</h3>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                <form method="post" action="/Account/Register">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de Usuario</label>
+                        <input type="text" name="username" class="form-control" placeholder="Ej: JuezPerez" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required />
+                        <div class="form-text">Usa una contraseña segura.</div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Crear Cuenta</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <a href="/Account/Login">¿Ya tienes cuenta? Inicia sesión aquí</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+﻿@model JustiSafe.Data.Entities.Case
+
+@{
+    ViewData["Title"] = "Nuevo Caso";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📝 Registrar Nuevo Caso</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Título del Caso (Privado)</label>
+                        <input asp-for="Title" class="form-label form-control" placeholder="Ej: Demanda Laboral vs Empresa X" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <small class="text-muted">Este título solo lo ve usted. En el sistema se mostrará el código anónimo.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Descripción</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        <input type="submit" value="Guardar Caso" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

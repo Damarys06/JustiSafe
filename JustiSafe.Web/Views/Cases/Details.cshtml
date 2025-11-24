@@ -1,0 +1,34 @@
+﻿@model JustiSafe.Data.Entities.Case
+
+@{
+    ViewData["Title"] = "Detalles del Caso";
+}
+
+<div class="container mt-4">
+    <div class="card border-info mb-3">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">📂 Expediente: @Model.AnonCode</h3>
+            <span class="badge bg-light text-dark">@Model.Status</span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Título Privado:</div>
+                <div class="col-sm-9">@Model.Title</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Descripción:</div>
+                <div class="col-sm-9">@Model.Description</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Fecha de Creación:</div>
+                <div class="col-sm-9">@Model.CreatedAt</div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.CaseId" class="btn btn-warning">Editar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Volver a la Lista</a>
+            </div>
+        </div>
+    </div>
+</div>
