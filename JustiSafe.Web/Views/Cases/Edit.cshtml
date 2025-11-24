@@ -1,14 +1,14 @@
 ﻿@model JustiSafe.Data.Entities.Case
 
 @{
-    ViewData["Title"] = "Editar Caso";
+    ViewData["Title"] = "Gestionar Caso";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">✏️ Editar Caso: @Model.AnonCode</h4>
+                <h4 class="mb-0">🔨 Gestionar Expediente: @Model.AnonCode</h4>
             </div>
             <div class="card-body">
                 <form asp-action="Edit">
@@ -16,31 +16,29 @@
                     <input type="hidden" asp-for="CaseId" />
 
                     <div class="mb-3">
-                        <label asp-for="Title" class="form-label">Título</label>
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <label asp-for="Title" class="form-label text-muted">Título del Caso (Protegido)</label>
+                        <input asp-for="Title" class="form-control bg-light" readonly />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Descripción</label>
-                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label asp-for="Description" class="form-label text-muted">Descripción (Protegido)</label>
+                        <textarea asp-for="Description" class="form-control bg-light" rows="4" readonly></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Status" class="form-label">Estado del Proceso</label>
-                        <select asp-for="Status" class="form-select">
-                            <option value="Abierto">Abierto</option>
+                    <div class="mb-3 p-3 border rounded border-primary bg-light bg-opacity-10">
+                        <label asp-for="Status" class="form-label fw-bold text-primary">Dictaminar Nuevo Estado</label>
+                        <select asp-for="Status" class="form-select border-primary">
+                            <option value="Abierto">Abierto (En Instrucción)</option>
                             <option value="En Revisión">En Revisión</option>
-                            <option value="Cerrado">Cerrado</option>
-                            <option value="Archivado">Archivado</option>
+                            <option value="Sentencia Pendiente">Sentencia Pendiente</option>
+                            <option value="Cerrado">Cerrado (Sentencia Firme)</option>
                         </select>
                         <span asp-validation-for="Status" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-secondary">Volver</a>
-                        <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        <input type="submit" value="Actualizar Estado" class="btn btn-primary px-4" />
                     </div>
                 </form>
             </div>
@@ -52,4 +50,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
 }
