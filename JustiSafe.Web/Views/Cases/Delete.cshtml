@@ -1,5 +1,46 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model JustiSafe.Data.Entities.Case
+
 @{
+    ViewData["Title"] = "Eliminar Caso";
 }
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card border-danger shadow">
+            <div class="card-header bg-danger text-white text-center">
+                <h3>⚠️ ¿Está seguro de eliminar este expediente?</h3>
+            </div>
+            <div class="card-body text-center">
+
+                <h2 class="text-danger fw-bold my-3">@Model.AnonCode</h2>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Esta acción es irreversible. Se eliminarán el caso y todas sus sentencias asociadas.
+                </div>
+
+                <ul class="list-group list-group-flush text-start mb-4">
+                    <li class="list-group-item">
+                        <strong>Título Privado:</strong> @Model.Title
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Estado Actual:</strong>
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Fecha de Creación:</strong> @Model.CreatedAt.ToShortDateString()
+                    </li>
+                </ul>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="CaseId" />
+
+                    <div class="d-grid gap-2 d-md-block">
+                        <a asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-danger px-4">Confirmar Eliminación</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
