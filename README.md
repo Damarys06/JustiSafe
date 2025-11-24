@@ -53,9 +53,9 @@ Asegúrate de que el Proyecto predeterminado (menú desplegable en la consola) s
 
 Ejecuta el comando:
 
-PowerShell
-
+```bash
 Update-Database
+```
 (Esto creará la base de datos JustiSafeDb y todas las tablas automáticamente).
 
 ### 4. Ejecutar
