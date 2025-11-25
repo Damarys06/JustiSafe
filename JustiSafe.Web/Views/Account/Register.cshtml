@@ -1,38 +1,65 @@
 ﻿@{
-    ViewData["Title"] = "Registrarse - JustiSafe";
+    ViewData["Title"] = "Crear Nueva Cuenta";
 }
 
 <div class="row justify-content-center mt-5">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="card shadow">
-            <div class="card-header bg-success text-white text-center">
-                <h3>📝 Crear Nueva Cuenta</h3>
+            <div class="card-header bg-dark text-white text-center">
+                <h3>📝 Alta de Funcionario</h3>
             </div>
             <div class="card-body">
-                @if (ViewBag.Error != null)
+
+                @if (ViewBag.SuccessMessage != null)
                 {
-                    <div class="alert alert-danger">@ViewBag.Error</div>
+                    <div class="alert alert-success text-center">
+                        <h4 class="alert-heading">✅ Cuenta Creada</h4>
+                        <hr>
+                        <p>El sistema ha generado tu credencial de acceso única y anónima:</p>
+
+                        <div class="p-3 mb-3 bg-light border rounded">
+                            <h1 class="fw-bold text-primary mb-0">@ViewBag.SuccessMessage</h1>
+                        </div>
+
+                        <p class="small text-danger fw-bold">⚠ IMPORTANTE: Anótalo ahora. No podrás recuperarlo después.</p>
+
+                        <div class="d-grid">
+                            <a href="/Account/Login" class="btn btn-primary">Ir a Iniciar Sesión</a>
+                        </div>
+                    </div>
                 }
+                else
+                {
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
 
-                <form method="post" action="/Account/Register">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre de Usuario</label>
-                        <input type="text" name="username" class="form-control" placeholder="Ej: JuezPerez" required />
-                    </div>
+                    <form method="post" action="/Account/Register">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="firstName" class="form-control" placeholder="Juan" required />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Apellido</label>
+                                <input type="text" name="lastName" class="form-control" placeholder="Perez" required />
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Contraseña</label>
-                        <input type="password" name="password" class="form-control" required />
-                        <div class="form-text">Usa una contraseña segura.</div>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" name="password" class="form-control" placeholder="Define tu clave secreta" required />
+                        </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Crear Cuenta</button>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark">Generar Credencial y Crear</button>
+                        </div>
+                    </form>
+                    <div class="card-footer text-center mt-3">
+                        <a href="/Account/Login">Volver al Login</a>
                     </div>
-                </form>
-            </div>
-            <div class="card-footer text-center">
-                <a href="/Account/Login">¿Ya tienes cuenta? Inicia sesión aquí</a>
+                }
             </div>
         </div>
     </div>
