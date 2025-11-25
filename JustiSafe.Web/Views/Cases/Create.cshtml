@@ -6,30 +6,37 @@
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-primary">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">📝 Registrar Nuevo Caso</h4>
+                <h4 class="mb-0">⚖ Sortear Nuevo Caso</h4>
             </div>
             <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    Al guardar, el sistema asignará automáticamente un <strong>Juez Aleatorio</strong> y generará un <strong>Código Anónimo</strong>.
+                </div>
+
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="mb-3">
-                        <label asp-for="Title" class="form-label">Título del Caso (Privado)</label>
-                        <input asp-for="Title" class="form-label form-control" placeholder="Ej: Demanda Laboral vs Empresa X" />
+                        <label asp-for="Title" class="form-label fw-bold">Título del Caso (Privado)</label>
+                        <input asp-for="Title" class="form-control" placeholder="Ej: Demanda Laboral vs Empresa X" required />
                         <span asp-validation-for="Title" class="text-danger"></span>
-                        <small class="text-muted">Este título solo lo ve usted. En el sistema se mostrará el código anónimo.</small>
+                        <small class="text-muted">Este título solo es visible para control interno.</small>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Descripción</label>
-                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <label asp-for="Description" class="form-label fw-bold">Descripción / Observaciones</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Detalles iniciales del expediente..." required></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
                         <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-                        <input type="submit" value="Guardar Caso" class="btn btn-success" />
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-shuffle"></i> Sortear y Guardar
+                        </button>
                     </div>
                 </form>
             </div>
