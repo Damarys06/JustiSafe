@@ -22,7 +22,7 @@ namespace JustiSafe.Core.Services
         {
             if (role == "Admin")
             {
-                // El Admin (Consejo) ve TODOS los casos y quién es el juez asignado
+                // El Admin ve todo y quién es el juez
                 return await _context.Cases
                     .Include(c => c.Judge)
                     .OrderByDescending(c => c.CreatedAt)
@@ -30,9 +30,11 @@ namespace JustiSafe.Core.Services
             }
             else
             {
-                // El Juez solo ve los casos que el sorteo le asignó
+                // El Juez ve solo lo suyo
+                // IMPORTANTE: Aquí agregamos el Include para que no salga error en la vista
                 return await _context.Cases
                     .Where(c => c.JudgeId == userId)
+                    .Include(c => c.Judge)
                     .OrderByDescending(c => c.CreatedAt)
                     .ToListAsync();
             }
@@ -46,29 +48,28 @@ namespace JustiSafe.Core.Services
                 .FirstOrDefaultAsync(c => c.CaseId == id);
         }
 
-        // LÓGICA DEL SORTEO DE JUECES
         public async Task CreateCaseAsync(Case newCase)
         {
-            // 1. Buscar todos los usuarios que sean Jueces activos
+            // 1. Buscar Jueces disponibles
             var judges = await _context.Users
                 .Where(u => u.Role == "Juez" && u.IsActive)
                 .ToListAsync();
 
             if (!judges.Any())
             {
-                throw new Exception("No es posible crear el caso: No existen jueces registrados en el sistema para realizar el sorteo.");
+                throw new Exception("No es posible crear el caso: No existen jueces registrados para el sorteo.");
             }
 
             // 2. Sorteo Aleatorio
             var random = new Random();
             var selectedJudge = judges[random.Next(judges.Count)];
 
-            // 3. Asignar datos automáticos
+            // 3. Asignar
             newCase.JudgeId = selectedJudge.UserId;
             newCase.CreatedAt = DateTime.Now;
             newCase.Status = "Sorteado";
 
-            // 4. Generar Código Anónimo (Ej: CASE-2025-X9Y1)
+            // 4. Generar Código Anónimo
             string year = DateTime.Now.Year.ToString();
             string randomPart = Guid.NewGuid().ToString().Substring(0, 4).ToUpper();
             newCase.AnonCode = $"CASE-{year}-{randomPart}";
