@@ -10,9 +10,7 @@
 
         @if (User.IsInRole("Admin"))
         {
-            <a asp-action="Create" class="btn btn-primary">
-                ⚖️ Sortear Nuevo Caso
-            </a>
+            <a asp-action="Create" class="btn btn-primary">⚖️ Sortear Nuevo Caso</a>
         }
     </div>
 
@@ -39,29 +37,39 @@
             {
                 <tr>
                     <td class="fw-bold text-primary">@item.AnonCode</td>
-
                     <td>@item.CreatedAt.ToShortDateString()</td>
-
                     <td>
-                        <span class="badge bg-info text-dark">@item.Status</span>
-                    </td>
-
-                    <td>
-                        @if (item.Judge != null)
+                        @if (item.Status == "Cerrado")
                         {
-                            <span class="badge bg-secondary">
-                                🔒 Identidad Protegida
-                            </span>
+                            <span class="badge bg-dark">Cerrado</span>
+                        }
+                        else if (item.Status == "Sorteado")
+                        {
+
+                            <span class="badge bg-warning text-dark">Nuevo Sorteo</span>
                         }
                         else
                         {
-                            <span class="text-warning">Pendiente de Sorteo</span>
+
+                            <span class="badge bg-info text-dark">@item.Status</span>
                         }
                     </td>
-
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-secondary">Ver Detalles</a>
-
+                        @if (item.Judge != null)
+                        {
+                            <span class="badge bg-success">✅ Asignado (Seguro)</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Error</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-secondary">Ver</a>
+                        @if (User.IsInRole("Admin") || (item.Judge?.Username == User.Identity?.Name))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.CaseId" class="btn btn-sm btn-warning">Gestionar</a>
+                        }
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-action="Delete" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-danger">Eliminar</a>
@@ -71,9 +79,4 @@
             }
         </tbody>
     </table>
-
-    @if (!Model.Any())
-    {
-        <div class="alert alert-warning mt-3">No hay casos asignados o registrados.</div>
-    }
 </div>
