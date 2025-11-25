@@ -18,7 +18,7 @@ namespace JustiSafe.Core.Services
             _context = context;
         }
 
-        // --- MÉTODO PRIVADO DE ENCRIPTACIÓN (HASHING) ---
+        // Método privado de Hashing
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -33,16 +33,30 @@ namespace JustiSafe.Core.Services
             }
         }
 
-        // Registro: Recibe contraseña plana -> Guarda encriptada
-        public async Task<User> RegisterUser(string username, string password, string role = "Juez")
+        // LÓGICA DE REGISTRO CON USUARIO ALEATORIO
+        public async Task<User> RegisterUser(string firstName, string lastName, string password, string role = "Juez")
         {
-            if (await _context.Users.AnyAsync(u => u.Username == username))
-                throw new Exception("El usuario ya existe");
+            // 1. Definir prefijo según rol
+            string prefix = (role == "Admin") ? "ADM" : "JUD";
 
+            // 2. Generar código aleatorio
+            string randomCode = Guid.NewGuid().ToString().Substring(0, 4).ToUpper();
+            string generatedUsername = $"{prefix}-{randomCode}";
+
+            // 3. Verificar unicidad (muy raro que se repita, pero por seguridad)
+            while (await _context.Users.AnyAsync(u => u.Username == generatedUsername))
+            {
+                randomCode = Guid.NewGuid().ToString().Substring(0, 4).ToUpper();
+                generatedUsername = $"{prefix}-{randomCode}";
+            }
+
+            // 4. Crear entidad
             var user = new User
             {
-                Username = username,
-                PasswordHash = HashPassword(password), // <--- ¡ENCRIPTADO AQUÍ!
+                Username = generatedUsername, // El sistema lo inventa
+                FirstName = firstName,
+                LastName = lastName,
+                PasswordHash = HashPassword(password), // Contraseña manual encriptada
                 Role = role,
                 IsActive = true
             };
@@ -52,7 +66,6 @@ namespace JustiSafe.Core.Services
             return user;
         }
 
-        // Login: Recibe contraseña plana -> Encripta y compara
         public async Task<User?> Login(string username, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
