@@ -2,13 +2,19 @@
 
 JustiSafe es una aplicación web monolítica diseñada para garantizar la imparcialidad en el sistema judicial mediante la anonimización de expedientes y la comunicación segura entre jueces y soporte técnico.
 
-## 🚀 Características Principales
+## 🚀 Características Principales (Microservicios)
 
-* **Arquitectura Monolítica N-Capas:** Separación lógica en Web (MVC), Core (Negocio) y Data (Persistencia).
-* **Anonimización Automática:** Generación de códigos únicos (ej: `CASE-2025-X9Y1`) para ocultar identidades y prevenir sesgos.
-* **Sorteo Aleatorio de Jueces:** Asignación automática de casos sin intervención humana directa por parte del administrador.
-* **Chat Seguro en Tiempo Real:** Implementado con **SignalR**, garantizando anonimato total: el administrador ve "Juez Anónimo" y el juez ve "Soporte Técnico".
-* **Seguridad:** Hashing de contraseñas (SHA256), autenticación basada en Cookies y autorización por Roles.
+El sistema ha sido migrado a una arquitectura de **Microservicios** para mejorar la escalabilidad y mantenibilidad.
+
+*   **Arquitectura de Microservicios:**
+    *   **Identity Service:** Manejo de usuarios, roles y autenticación (JWT).
+    *   **Cases Service:** Gestión de expedientes, sorteo de jueces y anonimización.
+    *   **Chat Service:** (Integrado en Web/Gateway) Comunicación en tiempo real.
+    *   **API Gateway (Ocelot):** Punto de entrada único para el frontend.
+*   **Seguridad Avanzada:** Implementación de OAuth2/OpenID Connect con JWT.
+*   **Anonimización Automática:** Lógica encapsulada en el servicio de Casos.
+*   **Sorteo Aleatorio de Jueces:** Algoritmo aislado en su propio microservicio.
+*   **DevOps:** Contenerización con Docker y orquestación con Docker Compose.
 
 ## 🛠️ Stack Tecnológico
 

@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'identity_service'
+    static_configs:
+      - targets: ['identity-api:8080']
+
+  - job_name: 'cases_service'
+    static_configs:
+      - targets: ['cases-api:8080']

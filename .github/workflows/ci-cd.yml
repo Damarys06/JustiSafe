@@ -1,0 +1,35 @@
+name: JustiSafe Microservices CI/CD
+
+on:
+  push:
+    branches: [ "main", "microservices-migration" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore Dependencies (Identity)
+      run: dotnet restore Services/JustiSafe.Identity.API/JustiSafe.Identity.API.csproj
+      
+    - name: Build (Identity)
+      run: dotnet build Services/JustiSafe.Identity.API/JustiSafe.Identity.API.csproj --no-restore
+      
+    - name: Restore Dependencies (Cases)
+      run: dotnet restore Services/JustiSafe.Cases.API/JustiSafe.Cases.API.csproj
+      
+    - name: Build (Cases)
+      run: dotnet build Services/JustiSafe.Cases.API/JustiSafe.Cases.API.csproj --no-restore
+
+    - name: Test
+      run: dotnet test JustiSafe.sln --no-build --verbosity normal

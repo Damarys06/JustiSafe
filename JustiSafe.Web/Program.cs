@@ -7,12 +7,21 @@ using JustiSafe.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. CONFIGURACIÓN DE SERVICIOS
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<JustiSafeDbContext>(options =>
-    options.UseSqlServer(connectionString));
+// 1. CONFIGURACIÓN DE SERVICIOS
+// Eliminamos DbContext directo
+// builder.Services.AddDbContext<JustiSafeDbContext>(...);
 
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICaseService, CaseService>();
+// Registramos Cliente HTTP para el Gateway
+builder.Services.AddHttpClient("GatewayClient", client =>
+{
+    // Use configuration value (in Docker it is http://gateway:8080)
+    var gatewayUrl = builder.Configuration["GatewayUrl"] ?? "http://localhost:5000";
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+
+// Removemos servicios internos antiguos
+// builder.Services.AddScoped<IUserService, UserService>();
+// builder.Services.AddScoped<ICaseService, CaseService>();
 
 // CONFIGURACIÓN DEL TIMEOUT DE SESIÓN
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

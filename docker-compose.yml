@@ -1,0 +1,64 @@
+services:
+  identity-api:
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: Services/JustiSafe.Identity.API/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sql-data;Database=JustiSafe_IdentityDb;User Id=sa;Password=Password123!;TrustServerCertificate=True;
+      - Jwt__Key=SecretKeySuperSegura1234567890EsMuyLargaParaSerSegura
+    depends_on:
+      - sql-data
+
+  cases-api:
+    image: ${DOCKER_REGISTRY-}casesapi
+    build:
+      context: .
+      dockerfile: Services/JustiSafe.Cases.API/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sql-data;Database=JustiSafe_CasesDb;User Id=sa;Password=Password123!;TrustServerCertificate=True;
+      - IdentityServiceUrl=http://identity-api:8080
+      - Jwt__Key=SecretKeySuperSegura1234567890EsMuyLargaParaSerSegura
+    depends_on:
+      - sql-data
+      - identity-api
+
+  gateway:
+    image: ${DOCKER_REGISTRY-}gateway
+    build:
+      context: .
+      dockerfile: Services/JustiSafe.Gateway/Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - identity-api
+      - cases-api
+
+  justisafe-web:
+    image: ${DOCKER_REGISTRY-}justisafeweb
+    build:
+      context: .
+      dockerfile: JustiSafe.Web/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sql-data;Database=JustiSafeDb;User Id=sa;Password=Password123!;TrustServerCertificate=True;
+      - GatewayUrl=http://gateway:8080
+    ports:
+      - "8090:8080"
+    depends_on:
+      - sql-data
+      - gateway
+
+  sql-data:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=Password123!
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"

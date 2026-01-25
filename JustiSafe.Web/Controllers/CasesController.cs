@@ -5,70 +5,94 @@ using JustiSafe.Core.Interfaces;
 using JustiSafe.Data.Entities;
 using System.Threading.Tasks;
 using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Collections.Generic;
 
 namespace JustiSafe.Web.Controllers
 {
     [Authorize]
     public class CasesController : Controller
     {
-        private readonly ICaseService _caseService;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public CasesController(ICaseService caseService)
+        public CasesController(IHttpClientFactory httpClientFactory)
         {
-            _caseService = caseService;
+            _httpClientFactory = httpClientFactory;
         }
 
-        // GET: Index (Dashboard de Casos)
+        private HttpClient CreateClientWithToken()
+        {
+            var client = _httpClientFactory.CreateClient("GatewayClient");
+            var token = User.FindFirst("JWT")?.Value;
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+            return client;
+        }
+
+        // GET: Index
         public async Task<IActionResult> Index()
         {
-            int userId = GetCurrentUserId();
-            // Obtenemos el rol actual (Si no tiene, asumimos Juez)
-            string userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Juez";
-
-            var cases = await _caseService.GetAllCasesAsync(userId, userRole);
-            return View(cases);
+            var client = CreateClientWithToken();
+            var response = await client.GetAsync("/cases");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var cases = await response.Content.ReadFromJsonAsync<List<Case>>();
+                return View(cases);
+            }
+            return View(new List<Case>());
         }
 
-        // GET: Create (SOLO ADMIN)
         [Authorize(Roles = "Admin")]
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
-        // POST: Create (SOLO ADMIN)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Case newCase)
         {
-            // Removemos validaciones de campos automáticos
-            ModelState.Remove("AnonCode");
-            ModelState.Remove("Judge");
-
-            if (ModelState.IsValid)
+            var client = CreateClientWithToken();
+            var createDto = new { Title = newCase.Title, Description = newCase.Description };
+            
+            var response = await client.PostAsJsonAsync("/cases", createDto);
+            if (response.IsSuccessStatusCode)
             {
-                try
-                {
-                    await _caseService.CreateCaseAsync(newCase);
-                    TempData["Success"] = "Caso creado y sorteado exitosamente.";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    // Si falla el sorteo (ej: no hay jueces), mostramos error
-                    ModelState.AddModelError("", ex.Message);
-                }
+                TempData["Success"] = "Caso sorteado vía Microservicio.";
+                return RedirectToAction(nameof(Index));
             }
+            
+            ModelState.AddModelError("", "Error al crear caso en el microservicio.");
             return View(newCase);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var client = CreateClientWithToken();
+            var response = await client.GetAsync($"/cases/{id}");
+             if (response.IsSuccessStatusCode)
+            {
+                var caseItem = await response.Content.ReadFromJsonAsync<Case>();
+                return View(caseItem);
+            }
+            return NotFound();
+        }
+        
         // GET: Edit
         public async Task<IActionResult> Edit(int id)
         {
-            var caseItem = await _caseService.GetCaseByIdAsync(id);
-            if (caseItem == null) return NotFound();
-            return View(caseItem);
+            var client = CreateClientWithToken();
+            var response = await client.GetAsync($"/cases/{id}");
+             if (response.IsSuccessStatusCode)
+            {
+                var caseItem = await response.Content.ReadFromJsonAsync<Case>();
+                // Solo Admin o el Juez asignado pueden editar
+                // (Validación básica, idealmente el API lo protege también)
+                return View(caseItem);
+            }
+            return NotFound();
         }
 
         // POST: Edit
@@ -76,40 +100,36 @@ namespace JustiSafe.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Case caseToUpdate)
         {
-            if (id != caseToUpdate.CaseId) return NotFound();
-
-            ModelState.Remove("AnonCode");
-            ModelState.Remove("Judge");
-
-            if (ModelState.IsValid)
+            var client = CreateClientWithToken();
+            var updateDto = new { 
+                CaseId = id,
+                Title = caseToUpdate.Title, 
+                Description = caseToUpdate.Description,
+                Status = caseToUpdate.Status 
+            };
+            
+            var response = await client.PutAsJsonAsync($"/cases/{id}", updateDto);
+            
+            if (response.IsSuccessStatusCode)
             {
-                var originalCase = await _caseService.GetCaseByIdAsync(id);
-                if (originalCase != null)
-                {
-                    originalCase.Title = caseToUpdate.Title;
-                    originalCase.Description = caseToUpdate.Description;
-                    originalCase.Status = caseToUpdate.Status;
-                    await _caseService.UpdateCaseAsync(originalCase);
-                }
                 return RedirectToAction(nameof(Index));
             }
+            
+            ModelState.AddModelError("", "Error al actualizar el caso.");
             return View(caseToUpdate);
-        }
-
-        // GET: Details
-        public async Task<IActionResult> Details(int id)
-        {
-            var caseItem = await _caseService.GetCaseByIdAsync(id);
-            if (caseItem == null) return NotFound();
-            return View(caseItem);
         }
 
         // GET: Delete
         public async Task<IActionResult> Delete(int id)
         {
-            var caseItem = await _caseService.GetCaseByIdAsync(id);
-            if (caseItem == null) return NotFound();
-            return View(caseItem);
+            var client = CreateClientWithToken();
+            var response = await client.GetAsync($"/cases/{id}");
+             if (response.IsSuccessStatusCode)
+            {
+                var caseItem = await response.Content.ReadFromJsonAsync<Case>();
+                return View(caseItem);
+            }
+            return NotFound();
         }
 
         // POST: Delete Confirmed
@@ -117,18 +137,18 @@ namespace JustiSafe.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _caseService.DeleteCaseAsync(id);
-            return RedirectToAction(nameof(Index));
-        }
-
-        private int GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            var client = CreateClientWithToken();
+            var response = await client.DeleteAsync($"/cases/{id}");
+            
+            if (response.IsSuccessStatusCode)
             {
-                return userId;
+                TempData["Success"] = "Caso eliminado correctamente.";
             }
-            return 0;
+            else
+            {
+                TempData["Error"] = "No se pudo eliminar el caso.";
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

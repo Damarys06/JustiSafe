@@ -1,0 +1,6 @@
+@JustiSafe.Cases.API_HostAddress = http://localhost:5049
+
+GET {{JustiSafe.Cases.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

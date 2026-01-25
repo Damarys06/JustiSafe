@@ -6,16 +6,18 @@ using JustiSafe.Core.Interfaces;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json; // Added for PostAsJsonAsync and ReadFromJsonAsync
 
 namespace JustiSafe.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public AccountController(IUserService userService)
+        public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _userService = userService;
+            _httpClientFactory = httpClientFactory;
         }
 
         // ============================================================
@@ -37,16 +39,22 @@ namespace JustiSafe.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password)
         {
-            var user = await _userService.Login(username, password);
+            var client = _httpClientFactory.CreateClient("GatewayClient");
+            var loginDto = new { Username = username, Password = password };
+            
+            var response = await client.PostAsJsonAsync("/auth/login", loginDto);
 
-            if (user != null)
+            if (response.IsSuccessStatusCode)
             {
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
                 // Crear la "identificación" del usuario (Claims)
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Username), // Guardamos el ID (ej: JUD-8492)
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("UserId", user.UserId.ToString())
+                    new Claim(ClaimTypes.Name, result.Username), // Guardamos el ID (ej: JUD-8492)
+                    new Claim(ClaimTypes.Role, result.Role),
+                    new Claim("UserId", result.UserId.ToString()),
+                    new Claim("JWT", result.Token) // Guardamos el Token para usarlo luego
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -59,7 +67,7 @@ namespace JustiSafe.Web.Controllers
                 return RedirectToAction("Index", "Home"); // Al entrar, va al Dashboard
             }
 
-            ViewBag.Error = "Credencial o contraseña incorrectos";
+            ViewBag.Error = "Credencial o contraseña incorrectos (Microservicio Identity)";
             return View();
         }
 
@@ -85,17 +93,44 @@ namespace JustiSafe.Web.Controllers
                 string role = (firstName.Equals("Super", StringComparison.OrdinalIgnoreCase) &&
                                lastName.Equals("Admin", StringComparison.OrdinalIgnoreCase)) ? "Admin" : "Juez";
 
-                var newUser = await _userService.RegisterUser(firstName, lastName, password, role);
+                var registerDto = new { FirstName = firstName, LastName = lastName, Password = password, Role = role };
+                
+                var client = _httpClientFactory.CreateClient("GatewayClient");
+                var response = await client.PostAsJsonAsync("/auth/register", registerDto);
 
-                // Enviamos el usuario generado (ej: ADM-1234 o JUD-5678) a la vista
-                ViewBag.SuccessMessage = newUser.Username;
-                return View();
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+                    // Enviamos el usuario generado (ej: ADM-1234 o JUD-5678) a la vista
+                    ViewBag.SuccessMessage = result.Username;
+                    return View();
+                }
+                else
+                {
+                    ViewBag.Error = "Error en el registro";
+                    return View();
+                }
             }
             catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
                 return View();
             }
+        }
+
+        // Clases DTO internas para deserializar respuestas
+        public class LoginResponse
+        {
+            public string Token { get; set; }
+            public string Role { get; set; }
+            public string Username { get; set; }
+            public int UserId { get; set; }
+        }
+
+        public class RegisterResponse
+        {
+            public string Message { get; set; }
+            public string Username { get; set; }
         }
 
         // ============================================================

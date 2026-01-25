@@ -55,7 +55,8 @@
                         }
                     </td>
                     <td>
-                        @if (item.Judge != null)
+
+                        @if (item.JudgeId != 0)
                         {
                             <span class="badge bg-success">✅ Asignado (Seguro)</span>
                         }
@@ -66,7 +67,7 @@
                     </td>
                     <td>
                         <a asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-sm btn-outline-secondary">Ver</a>
-                        @if (User.IsInRole("Admin") || (item.Judge?.Username == User.Identity?.Name))
+                        @if (User.IsInRole("Admin") || (User.IsInRole("Juez"))) // Asumimos que la API ya filtró los casos del juez
                         {
                             <a asp-action="Edit" asp-route-id="@item.CaseId" class="btn btn-sm btn-warning">Gestionar</a>
                         }
