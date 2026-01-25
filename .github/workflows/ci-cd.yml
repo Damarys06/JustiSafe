@@ -2,7 +2,7 @@ name: JustiSafe Microservices CI/CD
 
 on:
   push:
-    branches: [ "main", "microservices-migration" ]
+    branches: [ "main", "JustiSafeII" ]
   pull_request:
     branches: [ "main" ]
 
